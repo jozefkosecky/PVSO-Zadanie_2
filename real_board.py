@@ -2,39 +2,82 @@ import numpy as np
 import cv2 as cv
 import glob
 import matplotlib.pyplot as plt
+
+chessboardSize = (7, 5)
+frameSize = (600, 600)
+
 # termination criteria
 criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
+
 # prepare object points, like (0,0,0), (1,0,0), (2,0,0) ....,(6,5,0)
-objp = np.zeros((5*7,3), np.float32)
-objp[:,:2] = np.mgrid[0:7,0:5].T.reshape(-1,2)
+objp = np.zeros((chessboardSize[0] * chessboardSize[1], 3), np.float32)
+objp[:,:2] = np.mgrid[0:chessboardSize[0], 0:chessboardSize[1]].T.reshape(-1, 2)
+
 # Arrays to store object points and image points from all the images.
 objpoints = [] # 3d point in real world space
 imgpoints = [] # 2d points in image plane.
 
 images = glob.glob('*.jpg')
 
-for fname in images:
-    img = cv.imread(fname)
-    cropped_image = img[75:475, 100:600]
-    gray_image = cv.cvtColor(cropped_image, cv.COLOR_BGR2GRAY)
-
+for image in images:
+    print(image)
+    img = cv.imread(image)
+    # cropped_image = img[75:475, 100:600]
+    gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
     # plt.imshow(cropped_image, cmap="gray", vmin=0, vmax=255)
     # plt.show()
     # Find the chess board corners
-    ret, corners = cv.findChessboardCorners(gray_image, (7, 5), None)
+    ret, corners = cv.findChessboardCorners(gray, chessboardSize, None)
     # If found, add object points, image points (after refining them)
     if ret == True:
-        print("HEj")
         objpoints.append(objp)
-        corners2 = cv.cornerSubPix(gray_image, corners, (11, 11), (-1, -1), criteria)
+        corners2 = cv.cornerSubPix(gray, corners, (11, 11), (-1, -1), criteria)
         imgpoints.append(corners2)
+
         # Draw and display the corners
-        cv.drawChessboardCorners(cropped_image, (7, 5), corners2, ret)
-        cv.imshow('img', cropped_image)
-        cv.waitKey(500)
+        cv.drawChessboardCorners(img, chessboardSize, corners2, ret)
+        cv.imshow('img', img)
+        cv.waitKey(1000)
 
-        ret, mtx, dist, rvecs, tvecs = cv.calibrateCamera(objpoints, imgpoints, gray_image.shape[::-1], None, None)
-        print(mtx)
-
-        cv.waitKey(0)
 cv.destroyAllWindows()
+
+############ Calibration ######################
+
+ret, cameraMatrix, dist, rvecs, tvecs = cv.calibrateCamera(objpoints, imgpoints, frameSize, None, None)
+print("fx:", cameraMatrix.item(0, 0), "fy:", cameraMatrix.item(1, 1))
+print("cx:", cameraMatrix.item(0, 2), "cy:", cameraMatrix.item(1, 2))
+# print("Distortion parameters:", dist)
+# print("Rotation vectors:", rvecs)
+# print("Translation vectors:", tvecs)
+
+############ Undistortion ######################
+
+img = cv.imread('image14.jpg')
+h, w, n = img.shape
+newCameraMatrix, roi = cv.getOptimalNewCameraMatrix(cameraMatrix, dist, (w, h), 1, (w, h))
+
+# Undistort
+dst = cv.undistort(img, cameraMatrix, dist, None, newCameraMatrix)
+# crop the image
+x, y, w, h = roi
+dst = dst[y:y + h, x:x + w]
+cv.imwrite('calibResult1.png', dst)
+
+
+# Undistort with remapping
+# mapx, mapy = cv.initUndistortRectifyMap(cameraMatrix, dist, None, newCameraMatrix, (w, h), 5)
+# dst = cv.remap(img, mapx, mapy, cv.INTER_LINEAR)
+# # crop the image
+# x, y, w, h = roi
+# dst = dst[y:y + h, x:x + w]
+# cv.imwrite('calibResult2.png', dst)
+
+# Reprojection error
+mean_error = 0
+for i in range(len(objpoints)):
+    imgpoints2, _ = cv.projectPoints(objpoints[i], rvecs[i], tvecs[i], cameraMatrix, dist)
+    error = cv.norm(imgpoints[i], imgpoints2, cv.NORM_L2) / len(imgpoints2)
+    mean_error += error
+
+print("total error: {}".format(mean_error / len(objpoints)))
+

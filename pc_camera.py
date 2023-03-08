@@ -20,7 +20,7 @@ while counter != 15:
     ret, frame = cap.read()
 
     # resize the frame (if desired)
-    frame = cv2.resize(frame, (600, 600))
+    frame = cv2.resize(frame, (1440, 1080))
 
     # display the frame in a window
     cv2.imshow("test", frame)

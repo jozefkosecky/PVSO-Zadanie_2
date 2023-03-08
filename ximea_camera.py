@@ -32,7 +32,7 @@ counter = 0
 while counter != 15:
     cam.get_image(img)
     image = img.get_image_data_numpy(invert_rgb_order=False)
-    image = cv2.resize(image, (600, 600))
+    image = cv2.resize(image, (1440, 1080))
     cv2.imshow("test", image)
     key = cv2.waitKey(1)
 
