@@ -30,6 +30,7 @@ for fname in images:
         cv.drawChessboardCorners(img, (7, 6), corners2, ret)
 
         ret, mtx, dist, rvecs, tvecs = cv.calibrateCamera(objpoints, imgpoints, gray_image.shape[::-1], None, None)
+        print(mtx)
 
         cv.imshow('img', img)
         cv.waitKey(500)
