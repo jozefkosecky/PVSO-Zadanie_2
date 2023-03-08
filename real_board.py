@@ -32,6 +32,7 @@ for fname in images:
         ret, mtx, dist, rvecs, tvecs = cv.calibrateCamera(objpoints, imgpoints, gray_image.shape[::-1], None, None)
         print(mtx)
 
+
         cv.imshow('img', img)
         cv.waitKey(500)
 
