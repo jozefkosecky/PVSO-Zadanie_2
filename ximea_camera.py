@@ -12,6 +12,8 @@ cam = xiapi.Camera()
 # cam.open_device_by_SN('41305651')
 # (open by serial number)
 print('Opening first camera...')
+cam.open_device()
+
 # settings
 cam.set_exposure(10000)
 cam.set_param('imgdataformat', "XI_RGB32")
@@ -29,7 +31,7 @@ counter = 0
 
 while counter != 15:
     cam.get_image(img)
-    image = img.get_image_data_numpy(invert_rgb_order=True)
+    image = img.get_image_data_numpy(invert_rgb_order=False)
     image = cv2.resize(image, (600, 600))
     cv2.imshow("test", image)
     key = cv2.waitKey(1)
