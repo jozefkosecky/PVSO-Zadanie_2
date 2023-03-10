@@ -11,8 +11,12 @@ gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 # Apply Gaussian blur to reduce noise
 gray = cv2.GaussianBlur(gray, (9, 9), 2)
 
+edges = cv2.Canny(gray, 50, 100, apertureSize = 3)
+
+cv2.imshow("edges", edges)
+
 # Detect circles using Hough Circle Transform
-circles = cv2.HoughCircles(gray, cv2.HOUGH_GRADIENT, 1, 20, param1=100, param2=30, minRadius=0, maxRadius=0)
+circles = cv2.HoughCircles(edges, cv2.HOUGH_GRADIENT, 1, 20, param1=100, param2=30, minRadius=0, maxRadius=0)
 
 # If circles are detected, draw them on the image
 if circles is not None:

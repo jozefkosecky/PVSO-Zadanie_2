@@ -26,7 +26,11 @@ while True:
     gray = cv2.GaussianBlur(gray, (9, 9), 2)
 
     # Detect circles using Hough Circle Transform
-    circles = cv2.HoughCircles(gray, cv2.HOUGH_GRADIENT, dp, minDist, param1=param1, param2=param2, minRadius=minRadius,
+    edges = cv2.Canny(gray, 50, 100, apertureSize=3)
+    # circles = cv2.HoughCircles(edges, cv2.HOUGH_GRADIENT, 1, 20, param1=100, param2=30, minRadius=0, maxRadius=0)
+    cv2.imshow("edges", edges)
+
+    circles = cv2.HoughCircles(edges, cv2.HOUGH_GRADIENT, dp, minDist, param1=param1, param2=param2, minRadius=minRadius,
                                maxRadius=maxRadius)
 
     # If circles are detected, draw them on the frame
