@@ -3,7 +3,7 @@ import numpy as np
 import glob
 
 # Load the image
-img = cv2.imread('gulicky.jpg')
+img = cv2.imread('image0.jpg')
 
 # Convert the image to grayscale
 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -16,7 +16,7 @@ edges = cv2.Canny(gray, 50, 100, apertureSize = 3)
 cv2.imshow("edges", edges)
 
 # Detect circles using Hough Circle Transform
-circles = cv2.HoughCircles(edges, cv2.HOUGH_GRADIENT, 1, 20, param1=100, param2=30, minRadius=0, maxRadius=0)
+circles = cv2.HoughCircles(edges, cv2.HOUGH_GRADIENT, 1, 20, param1=50, param2=30, minRadius=50, maxRadius=150)
 
 # If circles are detected, draw them on the image
 if circles is not None:

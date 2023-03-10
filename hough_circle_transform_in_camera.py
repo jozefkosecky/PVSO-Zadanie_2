@@ -9,11 +9,11 @@ cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 
 # Define the Hough Circle Transform parameters
 dp = 1
-minDist = 50
-param1 = 200
-param2 = 100
+minDist = 20
+param1 = 50
+param2 = 30
 minRadius = 0
-maxRadius = 0
+maxRadius = 150
 
 while True:
     # Capture a frame from the camera
@@ -32,6 +32,8 @@ while True:
 
     circles = cv2.HoughCircles(edges, cv2.HOUGH_GRADIENT, dp, minDist, param1=param1, param2=param2, minRadius=minRadius,
                                maxRadius=maxRadius)
+
+    print(circles, "\n---------------------")
 
     # If circles are detected, draw them on the frame
     if circles is not None:
