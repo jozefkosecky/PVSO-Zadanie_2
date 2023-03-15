@@ -37,13 +37,16 @@ for image in images:
         # Draw and display the corners
         cv.drawChessboardCorners(img, chessboardSize, corners2, ret)
         cv.imshow('img', img)
-        cv.waitKey(1000)
+        cv.waitKey(200)
 
 cv.destroyAllWindows()
 
 ############ Calibration ######################
 
-ret, cameraMatrix, dist, rvecs, tvecs = cv.calibrateCamera(objpoints, imgpoints, frameSize, None, None)
+img = cv.imread('camera14.jpg')
+gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+ret, cameraMatrix, dist, rvecs, tvecs = cv.calibrateCamera(objpoints, imgpoints, gray.shape[::-1], None, None)
+print("cameraMatrix:", cameraMatrix)
 print("fx:", cameraMatrix.item(0, 0), "fy:", cameraMatrix.item(1, 1))
 print("cx:", cameraMatrix.item(0, 2), "cy:", cameraMatrix.item(1, 2))
 # print("Distortion parameters:", dist)
@@ -52,25 +55,32 @@ print("cx:", cameraMatrix.item(0, 2), "cy:", cameraMatrix.item(1, 2))
 
 ############ Undistortion ######################
 
-img = cv.imread('image14.jpg')
-h, w, n = img.shape
+
+cv.imshow("camera14.jpg", img)
+h,  w = img.shape[:2]
+print("image size", img.shape[::-1])
+print("h", h)
+print("w", w)
 newCameraMatrix, roi = cv.getOptimalNewCameraMatrix(cameraMatrix, dist, (w, h), 1, (w, h))
 
 # Undistort
 dst = cv.undistort(img, cameraMatrix, dist, None, newCameraMatrix)
 # crop the image
 x, y, w, h = roi
+print("roi", roi)
 dst = dst[y:y + h, x:x + w]
 cv.imwrite('calibResult1.png', dst)
-
+# img2 = cv.imread('calibResult1.jpg')
+# cv.imshow("calibResult1.jpg", img2)
 
 # Undistort with remapping
-# mapx, mapy = cv.initUndistortRectifyMap(cameraMatrix, dist, None, newCameraMatrix, (w, h), 5)
-# dst = cv.remap(img, mapx, mapy, cv.INTER_LINEAR)
-# # crop the image
-# x, y, w, h = roi
-# dst = dst[y:y + h, x:x + w]
-# cv.imwrite('calibResult2.png', dst)
+h,  w = img.shape[:2]
+mapx, mapy = cv.initUndistortRectifyMap(cameraMatrix, dist, None, newCameraMatrix, (w, h), 5)
+dst = cv.remap(img, mapx, mapy, cv.INTER_LINEAR)
+# crop the image
+x, y, w, h = roi
+dst = dst[y:y + h, x:x + w]
+cv.imwrite('calibResult2.png', dst)
 
 # Reprojection error
 mean_error = 0
@@ -80,4 +90,5 @@ for i in range(len(objpoints)):
     mean_error += error
 
 print("total error: {}".format(mean_error / len(objpoints)))
-
+cv.waitKey(0)
+cv.destroyAllWindows()

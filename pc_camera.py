@@ -14,13 +14,14 @@ cap.set(cv2.CAP_PROP_EXPOSURE, 0.1)
 cap.set(cv2.CAP_PROP_AUTO_WB, 1)
 
 counter = 0
+imageName = "camera"
 
-while counter != 15:
+while counter != 1:
     # capture a frame from the camera
     ret, frame = cap.read()
 
     # resize the frame (if desired)
-    frame = cv2.resize(frame, (1440, 1080))
+    frame = cv2.resize(frame, (600, 600))
 
     # display the frame in a window
     cv2.imshow("test", frame)
@@ -28,7 +29,7 @@ while counter != 15:
     key = cv2.waitKey(1)
 
     if key == ord(' '):
-        filename = "image{}.jpg".format(counter)
+        filename = imageName + "{}.jpg".format(counter)
         cv2.imwrite(filename, frame)
         counter += 1
         print("Saved image to {}".format(filename))

@@ -28,17 +28,18 @@ print('Starting data acquisition...')
 cam.start_acquisition()
 
 counter = 0
+imageName = "camera2"
 
-while counter != 15:
+while counter != 1:
     cam.get_image(img)
     image = img.get_image_data_numpy(invert_rgb_order=False)
-    image = cv2.resize(image, (1440, 1080))
+    image = cv2.resize(image, (600, 600))
     cv2.imshow("test", image)
     key = cv2.waitKey(1)
 
     if key == ord(' '):
         print("Hej")
-        filename = "image{}.jpg".format(counter)
+        filename = imageName + "{}.jpg".format(counter)
         cv2.imwrite(filename, image)
         counter += 1
         print("Saved image to {}".format(filename))

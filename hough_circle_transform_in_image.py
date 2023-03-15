@@ -17,7 +17,7 @@ cv2.imshow("edges", edges)
 
 # Detect circles using Hough Circle Transform
 circles = cv2.HoughCircles(edges, cv2.HOUGH_GRADIENT, 1, 20, param1=100, param2=30, minRadius=0, maxRadius=0)
-
+print(circles)
 # If circles are detected, draw them on the image
 if circles is not None:
     circles = circles[0]
@@ -56,6 +56,7 @@ for image in images:
     circles = cv2.HoughCircles(gray, cv2.HOUGH_GRADIENT, dp, minDist, param1=param1, param2=param2, minRadius=minRadius,
                                maxRadius=maxRadius)
 
+    print(image, "\n", circles, "\n----------------------------")
     # If circles are detected, draw them on the frame
     if circles is not None:
         circles = circles[0]
